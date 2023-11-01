@@ -3,6 +3,8 @@ package nextcore.employees_manager.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import nextcore.employees_manager.DTO.EmployeeDto;
+import nextcore.employees_manager.DTO.EmployeesDTO;
 import nextcore.employees_manager.entity.Certification;
 import nextcore.employees_manager.entity.Department;
 import nextcore.employees_manager.entity.Employee;
@@ -37,25 +42,53 @@ public class EmployeeController {
 	@Autowired
 	private CertificationRepository cRepository;
 
-	@GetMapping("/employees")
-	public Map<String, Object> getListEmployee(String employeeName, Long departmentId) {
-		List<Employee> employees = eService.getAllEployeeByNameOrDeparment(employeeName, departmentId);
-		long totalRecord = eRepository.count();
-		Map<String, Object> response = new HashMap<>();
-		response.put("totalRecord", totalRecord);
-		response.put("employees", employees);
-		return response;
+//	@GetMapping("/employees")
+//	public Map<String, Object> getListEmployee(String employeeName, Long departmentId) {
+//		List<Employee> employees = eService.getAllEployeeByNameOrDeparment(employeeName, departmentId);
+//		long totalRecord = eRepository.count();
+//		Map<String, Object> response = new HashMap<>();
+//		response.put("totalRecord", totalRecord);
+//		response.put("employees", employees);
+//		return response;
+//	}
+
+	@GetMapping("/listemp")
+	public ResponseEntity<Object> getListEmployee(@RequestParam(name = "employeeName", required = false) String employeeName,
+			@RequestParam(name = "departmentId", required = false) Long departmentId) {
+		List<EmployeesDTO> eDto = eService.getListEmployee(employeeName, departmentId);
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("code", 200);
+		map.put("employees", eDto);
+		return new ResponseEntity<Object>(map, HttpStatus.OK);
+	}
+
+	@GetMapping("/listemployee")
+	public List<EmployeeDto> getDsEmployees() {
+		return eService.getEmployees().stream().map(employee -> {
+			EmployeeDto eDto = new EmployeeDto();
+			eDto.setEmployeeId(employee.getEmployeeId());
+			eDto.setEmployeeName(employee.getEmployeeName());
+			eDto.setEmployeeBirthDate(employee.getEmployeeBirthDate());
+			eDto.setEmployeeNameKana(employee.getEmployeeNameKana());
+			eDto.setEmployeeTelephone(employee.getEmployeeTelephone());
+			eDto.setEmployeeEmail(employee.getEmployeeEmail());
+			eDto.setEmployeescertifications(employee.getEmployeesCertifications());
+			eDto.setEmployeescertifications(employee.getEmployeesCertifications());
+			eDto.setDepartmentName(employee.getDepartmentName());
+			eDto.setCertificationName(employee.getCertificationName());
+			return eDto;
+		}).collect(Collectors.toList());
 	}
 
 	@GetMapping("/employees/{id}")
-	public Employee getEmployees(@PathVariable Long id) {
+	public Employee getEmployeeById(@PathVariable Long id) {
 		return eService.getEmployeeById(id);
 	}
 
 	@PostMapping("/employees")
 	public Employee addEmployee(@RequestBody Employee employee) {
 		eService.addEmployee(employee);
-		return eService.getEmployeeById(employee.getEmployeeId()); 
+		return eService.getEmployeeById(employee.getEmployeeId());
 	}
 
 	@PutMapping("/employees/{id}")
@@ -66,11 +99,6 @@ public class EmployeeController {
 	@DeleteMapping("/employees/{id}")
 	public void deleteEmployee(@PathVariable Long id) {
 		eService.deleteEmployee(id);
-	}
-
-	@GetMapping("/employee")
-	public List<Employee> getAllEmployees(String employeeName, Long departmentId) {
-		return eService.getAllEployeeByNameOrDeparment(employeeName, departmentId);
 	}
 
 }

@@ -10,6 +10,8 @@ import org.springframework.stereotype.Repository;
 import nextcore.employees_manager.entity.EmployeesCertifications;
 @Repository
 public interface EmployeesCertificationsRepository extends JpaRepository<EmployeesCertifications, Long >{
+	
+	
 //	 @Query(value = "SELECT * FROM employees_certifications WHERE employee_id = :employeeId", nativeQuery = true)
 //	    List<EmployeesCertifications> findByEmployeeId(@Param("employeeId") Long employeeId);
 }

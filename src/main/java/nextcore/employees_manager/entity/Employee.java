@@ -1,7 +1,17 @@
 package nextcore.employees_manager.entity;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -32,7 +42,7 @@ import lombok.Setter;
 @Table(name = "employees")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Employee {
+public class Employee implements UserDetails{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "employee_id")
@@ -49,12 +59,23 @@ public class Employee {
 					@JoinColumn(name = "certification_id"  , referencedColumnName = "certification_id") })
 //	@JsonManagedReference
 	private Set<Certification> certifications;
+
+	public List<String> getCertificationName() {
+		return certifications.stream().map(item -> {
+			return item.getCertificationName();
+		}).collect(Collectors.toList());
+	}
 	
+	public void setCertifications(Set<Certification> certifications) {
+		this.certifications = certifications;
+	}
+
 	@OneToMany
 	@JoinColumn(name = "employee_id")
     private Set<EmployeesCertifications> employeescertifications;
 	
-	
+
+//	private EmployeesCertifications employeeCertifications;
 	@Column(name = "employee_name")
 	@NotNull(message = "employee_name should be null !")
 	private String employeeName;
@@ -62,8 +83,7 @@ public class Employee {
 	@Column(name = "employee_name_kana")
 	private String employeeNameKana;
 
-	@Column(name = "employee_birth_day")
-//	@JsonFormat(pattern = "dd/MM/yyyy")
+	@Column(name = "employee_birth_date")
 	private LocalDate employeeBirthDate;
 
 	@Column(name = "employee_email",unique = true)
@@ -78,13 +98,40 @@ public class Employee {
 
 	@Column(name = "employee_login_password")
 	@Size(min=6,max=10)
-	@JsonIgnore
+//	@JsonIgnore
 	private String employeeLoginPassword;
 
 	public Long getEmployeeId() {
 		return employeeId;
 	}
+	public String getTest() {
+		return department.getDepartmentName(); 
+	}
 	
+	public Employee(Long employeeId, Department department, Set<Certification> certifications,
+			Set<EmployeesCertifications> employeescertifications,
+			@NotNull(message = "employee_name should be null !") String employeeName, String employeeNameKana,
+			LocalDate employeeBirthDate,
+			@Email(message = "Please enter the valid email password !") String employeeEmail, String employeeTelephone,
+			String employeeLoginId, @Size(min = 3, max = 10) String employeeLoginPassword) {
+		super();
+		this.employeeId = employeeId;
+		this.department = department;
+		this.certifications = certifications;
+		this.employeescertifications = employeescertifications;
+		this.employeeName = employeeName;
+		this.employeeNameKana = employeeNameKana;
+		this.employeeBirthDate = employeeBirthDate;
+		this.employeeEmail = employeeEmail;
+		this.employeeTelephone = employeeTelephone;
+		this.employeeLoginId = employeeLoginId;
+		this.employeeLoginPassword = employeeLoginPassword;
+	}
+
+	public Employee() {
+		super();
+	}
+
 	public void setEmployeeId(Long employeeId) {
 		this.employeeId = employeeId;
 	}
@@ -98,6 +145,10 @@ public class Employee {
 	public Department getDepartment() {
 		return department;
 	}
+	public String getDepartmentName() {
+		return department.getDepartmentName();
+	}
+	
 	public Set<EmployeesCertifications> getEmployeesCertifications() {
 		return employeescertifications;
 	}
@@ -162,9 +213,42 @@ public class Employee {
 		this.employeeLoginPassword = employeeLoginPassword;
 	}
 	public Employee getDetailEmADD(Employee e) {
-		
-		
 		return e;
+	}
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return null;
+	}
+
+	@Override
+	public String getPassword() {
+		return employeeLoginPassword;
+	}
+
+	@Override
+	public String getUsername() {
+		return employeeLoginId;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		return true;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return true;
 	}
 
 }

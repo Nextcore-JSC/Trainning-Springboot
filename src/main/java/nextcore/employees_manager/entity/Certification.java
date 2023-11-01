@@ -1,5 +1,7 @@
 package nextcore.employees_manager.entity;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -41,11 +43,9 @@ public class Certification {
     @JsonIgnore
     private Set<Employee> employees;
     
-//    @OneToMany(mappedBy = "certification")
-//    Set<Employees_Certifications> registrations;
-	@OneToMany
-	@JoinColumn(name = "certification_id")
-	private Set<EmployeesCertifications> employeesCertifications;
+//	@OneToMany
+//	@JoinColumn(name = "certification_id")
+//	private Set<EmployeesCertifications> employeesCertifications;
 	
     @Column(name = "certification_name")
     @NotNull(message ="certification_name should be null")
@@ -63,8 +63,25 @@ public class Certification {
 		this.certificationId = certificationId;
 	}
 
+	
+	public Set<Employee> getEmployees() {
+		return employees;
+	}
+
+	public void setEmployees(Set<Employee> employees) {
+		this.employees = employees;
+	}
+
+//	public Set<EmployeesCertifications> getEmployeesCertifications() {
+//		return employeesCertifications;
+//	}
+//
+//	public void setEmployeesCertifications(Set<EmployeesCertifications> employeesCertifications) {
+//		this.employeesCertifications = employeesCertifications;
+//	}
+
 	public String getCertificationName() {
-		return certificationName;
+		return this.certificationName;
 	}
 
 	public void setCertificationName(String certificationName) {
