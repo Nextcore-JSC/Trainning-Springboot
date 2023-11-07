@@ -19,17 +19,11 @@ public class EmployeeDto {
 	private String employeeEmail;
 	private String employeeTelephone;
 	private String departmentName;
-	private List<String> cetificationtName;
-	@JsonIgnore
-	private Department department;
-	@JsonIgnore
-	private Set<Certification> certifications;
-	private Set<EmployeesCertifications> employeescertifications;
-	
+	private List<CertificationDTO> certifications;
+
 	public Long getEmployeeId() {
 		return employeeId;
 	}
-
 
 	public void setEmployeeId(Long employeeId) {
 		this.employeeId = employeeId;
@@ -38,7 +32,7 @@ public class EmployeeDto {
 	public String getEmployeeName() {
 		return employeeName;
 	}
-	
+
 	public void setEmployeeName(String employeeName) {
 		this.employeeName = employeeName;
 	}
@@ -54,6 +48,7 @@ public class EmployeeDto {
 	public LocalDate getEmployeeBirthDate() {
 		return employeeBirthDate;
 	}
+	
 
 	public void setEmployeeBirthDate(LocalDate employeeBirthDate) {
 		this.employeeBirthDate = employeeBirthDate;
@@ -75,50 +70,25 @@ public class EmployeeDto {
 		this.employeeTelephone = employeeTelephone;
 	}
 
-	public Department getDepartment() {
-		return department;
-	}
-
-	public void setDepartment(Department department) {
-		this.department = department;
-	}
 	public String getDepartmentName() {
 		return departmentName;
 	}
-	public void setDepartmentName(String dep) {
-		this.departmentName=dep;
+
+	public void setDepartmentName(String departmentName) {
+		this.departmentName = departmentName;
 	}
-	public Set<Certification> getCertifications() {
+
+	public List<CertificationDTO> getCertifications() {
 		return certifications;
 	}
-	public List<String> getCertificationName() {
-		return cetificationtName;
-	}
-	public void setCertificationName(List<String> cetificationtName) {
-		this.cetificationtName=cetificationtName;
-	}
 
-//	public void setCertifications(Set<Certification> certifications) {
-//		this.certifications = certifications;
-//	}
-
-
-	public EmployeeDto() {
-		super();
-	}
-
-	public Set<EmployeesCertifications> getEmployeescertifications() {
-		return employeescertifications;
-	}
-
-	public void setEmployeescertifications(Set<EmployeesCertifications> employeescertifications) {
-		this.employeescertifications = employeescertifications;
+	public void setCertifications(List<CertificationDTO> certifications) {
+		this.certifications = certifications;
 	}
 
 	public EmployeeDto(Long employeeId, String employeeName, String employeeNameKana, LocalDate employeeBirthDate,
-			String employeeEmail, String employeeTelephone, String departmentName, List<String> cetificationtName,
-			Department department, Set<Certification> certifications,
-			Set<EmployeesCertifications> employeescertifications) {
+			String employeeEmail, String employeeTelephone, String departmentName,
+			List<CertificationDTO> certifications) {
 		super();
 		this.employeeId = employeeId;
 		this.employeeName = employeeName;
@@ -127,9 +97,11 @@ public class EmployeeDto {
 		this.employeeEmail = employeeEmail;
 		this.employeeTelephone = employeeTelephone;
 		this.departmentName = departmentName;
-		this.cetificationtName = cetificationtName;
-		this.department = department;
 		this.certifications = certifications;
-		this.employeescertifications = employeescertifications;
 	}
+
+	public EmployeeDto() {
+		super();
+	}
+
 }

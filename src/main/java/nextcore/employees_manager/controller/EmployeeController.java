@@ -20,14 +20,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import nextcore.employees_manager.DTO.EmployeeDto;
+import nextcore.employees_manager.DTO.EmployeesCertificationsDTO;
 import nextcore.employees_manager.DTO.EmployeesDTO;
-import nextcore.employees_manager.entity.Certification;
-import nextcore.employees_manager.entity.Department;
 import nextcore.employees_manager.entity.Employee;
-import nextcore.employees_manager.entity.EmployeesCertifications;
+import nextcore.employees_manager.exception.ErrorMessage;
+import nextcore.employees_manager.exception.FieldFormatException;
+import nextcore.employees_manager.exception.MessageErrorValidate;
+import nextcore.employees_manager.exception.ResourceNotFoundException;
 import nextcore.employees_manager.respository.CertificationRepository;
 import nextcore.employees_manager.respository.EmployeeRepository;
-import nextcore.employees_manager.respository.EmployeesCertificationsRepository;
 import nextcore.employees_manager.service.DepartmentService;
 import nextcore.employees_manager.service.EmployeeService;
 
@@ -42,53 +43,70 @@ public class EmployeeController {
 	@Autowired
 	private CertificationRepository cRepository;
 
-//	@GetMapping("/employees")
-//	public Map<String, Object> getListEmployee(String employeeName, Long departmentId) {
-//		List<Employee> employees = eService.getAllEployeeByNameOrDeparment(employeeName, departmentId);
-//		long totalRecord = eRepository.count();
-//		Map<String, Object> response = new HashMap<>();
-//		response.put("totalRecord", totalRecord);
-//		response.put("employees", employees);
-//		return response;
+//	@GetMapping("/employee/")
+//	public ResponseEntity<Object> getListEmployeeId(@PathVariable(name = "id") Long id) {
+//		EmployeesCertificationsDTO eDto = eService.loadEmployeeById(id);
+//		if (eDto == null) {
+//			throw new ResourceNotFoundException("Không tìm thấy nhân viên với id = " + id);
+//		}
+//		Map<String, Object> map = new HashMap<String, Object>();
+//		map.put("code", 200);
+//		map.put("employees", eDto);
+//		return new ResponseEntity<Object>(map, HttpStatus.OK);
 //	}
-
 	@GetMapping("/listemp")
-	public ResponseEntity<Object> getListEmployee(@RequestParam(name = "employeeName", required = false) String employeeName,
-			@RequestParam(name = "departmentId", required = false) Long departmentId) {
-		List<EmployeesDTO> eDto = eService.getListEmployee(employeeName, departmentId);
+	public ResponseEntity<Object> getListEmployee(
+			@RequestParam(name = "employeeName", required = false) String employeeName,
+			@RequestParam(name = "departmentId", required = false) Long departmentId,
+			@RequestParam(name = "ordEmployeeName", required = false) String ordEmployeeName,
+			@RequestParam(name = "ordCertificationName", required = false) String ordCertificationName,
+			@RequestParam(name = "ordEndDate", required = false) String ordEndDate,
+			@RequestParam(name = "offset", defaultValue = "0") int offset,
+			@RequestParam(name = "limit", defaultValue = "5") int limit) {
+		return eService.getListEmployee(employeeName, departmentId, ordEmployeeName,
+				ordCertificationName, ordEndDate, offset, limit);
+
+	}
+
+	private void validateOrderParameter(String ordEmployeeName, String ordCertificationName, String ordEndDate)
+			throws FieldFormatException {
+		if (ordEmployeeName != null && !ordEmployeeName.equalsIgnoreCase("ASC")
+				&& !ordEmployeeName.equalsIgnoreCase("DESC")) {
+			throw new FieldFormatException("ER021");
+		}
+
+		if (ordCertificationName != null && !ordCertificationName.equalsIgnoreCase("ASC")
+				&& !ordCertificationName.equalsIgnoreCase("DESC")) {
+			throw new FieldFormatException("ER021");
+		}
+
+		if (ordEndDate != null && !ordEndDate.equalsIgnoreCase("ASC") && !ordEndDate.equalsIgnoreCase("DESC")) {
+			throw new FieldFormatException("ER021");
+		}
+	}
+
+	public void validateOffsetParameter(int offset) throws FieldFormatException {
+		if (offset <= 0) {
+			throw new FieldFormatException( "ER018");
+		}
+	}
+
+	@GetMapping("/employee/{id}")
+	public ResponseEntity<Object> getListEmployeeId(@PathVariable(name = "id") Long id) {
+		EmployeesCertificationsDTO eDto = eService.loadEmployeeById(id);
+		if (eDto == null) {
+			throw new ResourceNotFoundException("Không tìm thấy nhân viên với id = " + id);
+		}
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("code", 200);
 		map.put("employees", eDto);
 		return new ResponseEntity<Object>(map, HttpStatus.OK);
 	}
 
-	@GetMapping("/listemployee")
-	public List<EmployeeDto> getDsEmployees() {
-		return eService.getEmployees().stream().map(employee -> {
-			EmployeeDto eDto = new EmployeeDto();
-			eDto.setEmployeeId(employee.getEmployeeId());
-			eDto.setEmployeeName(employee.getEmployeeName());
-			eDto.setEmployeeBirthDate(employee.getEmployeeBirthDate());
-			eDto.setEmployeeNameKana(employee.getEmployeeNameKana());
-			eDto.setEmployeeTelephone(employee.getEmployeeTelephone());
-			eDto.setEmployeeEmail(employee.getEmployeeEmail());
-			eDto.setEmployeescertifications(employee.getEmployeesCertifications());
-			eDto.setEmployeescertifications(employee.getEmployeesCertifications());
-			eDto.setDepartmentName(employee.getDepartmentName());
-			eDto.setCertificationName(employee.getCertificationName());
-			return eDto;
-		}).collect(Collectors.toList());
-	}
-
-	@GetMapping("/employees/{id}")
-	public Employee getEmployeeById(@PathVariable Long id) {
-		return eService.getEmployeeById(id);
-	}
-
 	@PostMapping("/employees")
 	public Employee addEmployee(@RequestBody Employee employee) {
-		eService.addEmployee(employee);
-		return eService.getEmployeeById(employee.getEmployeeId());
+		return eService.addEmployee(employee);
+
 	}
 
 	@PutMapping("/employees/{id}")
@@ -98,7 +116,7 @@ public class EmployeeController {
 
 	@DeleteMapping("/employees/{id}")
 	public void deleteEmployee(@PathVariable Long id) {
-		eService.deleteEmployee(id);
+		eService.deleteEmployeeById(id);
 	}
 
 }

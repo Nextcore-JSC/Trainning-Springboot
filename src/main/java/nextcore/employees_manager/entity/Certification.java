@@ -1,6 +1,7 @@
 package nextcore.employees_manager.entity;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -41,7 +42,7 @@ public class Certification {
             CascadeType.MERGE
         }, mappedBy = "certifications")
     @JsonIgnore
-    private Set<Employee> employees;
+    private Set<Employee> employees =new HashSet<>();
     
 //	@OneToMany
 //	@JoinColumn(name = "certification_id")

@@ -251,4 +251,8 @@ public class Employee implements UserDetails{
 		return true;
 	}
 
+	public Set<Certification> getCertifications() {
+	    return certifications;
+	}
+
 }

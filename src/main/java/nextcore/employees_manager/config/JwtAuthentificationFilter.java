@@ -25,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.FOUND;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 @Component
 @RequiredArgsConstructor
@@ -41,14 +42,12 @@ public class JwtAuthentificationFilter extends OncePerRequestFilter{
 				JWTVerifier verifier = JWT.require(algorithm).build();
 				DecodedJWT decodeJWT = verifier.verify(token);
 				String employeeNameLogin = decodeJWT.getSubject();
-				System.out.println(employeeNameLogin);
 				UsernamePasswordAuthenticationToken usernamePasswordAuthentificationToken = new UsernamePasswordAuthenticationToken(employeeNameLogin,null,null);
-				System.out.println(usernamePasswordAuthentificationToken);
 				SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthentificationToken);
 				filterChain.doFilter(request, response);
 			} catch (Exception e) {
 				response.setHeader("error", e.getMessage());
-				response.setStatus(FORBIDDEN.value());
+				response.setStatus(FOUND.value());
 				Map<String,String> error = new HashMap<String,String>();
 				error.put("error_message", e.getMessage());
 				response.setContentType(APPLICATION_JSON_VALUE);

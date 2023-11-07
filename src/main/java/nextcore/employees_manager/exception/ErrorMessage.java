@@ -3,19 +3,19 @@ package nextcore.employees_manager.exception;
 import java.util.Date;
 
 public class ErrorMessage {
-  private int code;
-  private String message;
+  private String code;
+  private String params;
 
-  public ErrorMessage(int code,  String message) {
-    this.code = code;
-    this.message = message;
+  public ErrorMessage(String i,  String params) {
+    this.code = i;
+    this.params = params;
   }
 
-  public int getCode() {
+  public String getCode() {
     return code;
   }
 
-  public String getMessage() {
-    return message;
+  public String getParams() {
+    return params;
   }
 }
